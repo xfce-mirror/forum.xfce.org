@@ -42,10 +42,11 @@ function sha256question_check()
 
 	// Because the user might be in a different time zone, or day changed right
 	// after submit, we also check the hash of yesterday and tomorrow.
+	$timstamp = time();
 	foreach (array (0, 1, -1) as $i)
 	{
 		// The date command adds a new line at the end
-		$str = gmstrftime ($question_format, time() - ($i * 60*60*24)) ."\n";
+		$str = gmstrftime ($question_format, $timstamp - ($i * 60*60*24)) ."\n";
 		$answer = hash ("sha256", $str);
 
 		if (sha256question_normalize ($answer) == $user_answer)
