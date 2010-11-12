@@ -135,6 +135,9 @@ if (!defined('PUN_DISABLE_BUFFERING'))
 // Define standard date/time formats
 $forum_time_formats = array($pun_config['o_time_format'], 'H:i:s', 'H:i', 'g:i:s a', 'g:i a');
 $forum_date_formats = array($pun_config['o_date_format'], 'Y-m-d', 'Y-d-m', 'd-m-Y', 'm-d-Y', 'M j Y', 'jS M Y');
+ 
+// BadBehavior will stop the spammers!
+require PUN_ROOT.'include/bad-behavior-fluxbb.php';
 
 // Check/update/set cookie and fetch user info
 $pun_user = array();
