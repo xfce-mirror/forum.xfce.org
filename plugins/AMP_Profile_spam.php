@@ -107,7 +107,7 @@ if (isset($_POST['delete-users']) && is_array($_POST['delete-users']))
 						{
 						echo '<tr>
 							<td style="width:150px;"><a href="profile.php?id='.$cur_user['id'].'">'.pun_htmlspecialchars($cur_user['username']).'</a></td>
-							<td style="width:50px;"><input type="checkbox" name="delete-users[]" value="'.$cur_user['id'].'" /></td>
+							<td style="width:50px;"><input type="checkbox" name="delete-users[]" value="'.$cur_user['id'].'" checked /></td>
 							<td> '.pun_htmlspecialchars(wordwrap(stripslashes($cur_user['signature'].$cur_user['url']), 30, ' ', true)).' </td>
 						</tr>';
 						continue 2;
