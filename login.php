@@ -16,6 +16,11 @@ require PUN_ROOT.'include/common.php';
 // Load the login.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/login.php';
 
+function un_htmlspecialchars($string)
+{
+	return strtr($string, array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' '));
+}
+
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 
 if (isset($_POST['form_sent']) && $action == 'in')
@@ -30,34 +35,47 @@ if (isset($_POST['form_sent']) && $action == 'in')
 	$cur_user = $db->fetch_assoc($result);
 
 	$authorized = false;
+	$update_db_password = false;
 
 	if (!empty($cur_user['password']))
 	{
-		$form_password_hash = pun_hash($form_password); // Will result in a SHA-1 hash
+		// Will result in a SHA-1 hash
+		$form_password_hash = pun_hash($form_password);
 
-		// If there is a salt in the database we have upgraded from 1.3-legacy though havent yet logged in
-		if (!empty($cur_user['salt']))
+		if (strlen($cur_user['password']) != 40)
 		{
-			if (sha1($cur_user['salt'].sha1($form_password)) == $cur_user['password']) // 1.3 used sha1(salt.sha1(pass))
-			{
-				$authorized = true;
-
-				$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\', salt=NULL WHERE id='.$cur_user['id']) or error('Unable to update user password', __FILE__, __LINE__, $db->error());
-			}
-		}
-		// If the length isn't 40 then the password isn't using sha1, so it must be md5 from 1.2
-		else if (strlen($cur_user['password']) != 40)
-		{
+			// Old SMF 1.0.x password
 			if (md5($form_password) == $cur_user['password'])
 			{
 				$authorized = true;
-
-				$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\' WHERE id='.$cur_user['id']) or error('Unable to update user password', __FILE__, __LINE__, $db->error());
+				$update_db_password = true;
 			}
 		}
-		// Otherwise we should have a normal sha1 password
 		else
-			$authorized = ($cur_user['password'] == $form_password_hash);
+		{
+			if ($cur_user['password'] == $form_password_hash)
+			{
+				// New FluxBB password
+				$authorized = true;
+			}
+			else
+			{
+				// Old SMF 1.1.x password
+				$smf_password_hash = sha1(strtolower($form_username) . un_htmlspecialchars(stripslashes($form_password)));
+				if ($cur_user['password'] == $smf_password_hash)
+				{
+					$authorized = true;
+					$update_db_password = true;
+				}
+			}
+		}
+
+		if ($authorized && $update_db_password)
+		{
+			// Replace the SMF password with an FluxBB password
+			$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\', salt=NULL WHERE id='.$cur_user['id']) 
+				or error('Unable to update user password', __FILE__, __LINE__, $db->error());
+		}
 	}
 
 	if (!$authorized)
