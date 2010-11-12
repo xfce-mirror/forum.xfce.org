@@ -296,7 +296,7 @@ else if ($action == 'change_email')
 
 else if ($action == 'upload_avatar' || $action == 'upload_avatar2')
 {
-	if ($pun_config['o_avatars'] == '0')
+	if ($pun_config['o_avatars'] == '0' || $pun_config['o_avatars_size'] == '0')
 		message($lang_profile['Avatars disabled']);
 
 	if ($pun_user['id'] != $id && !$pun_user['is_admmod'])
@@ -1010,7 +1010,7 @@ if ($pun_user['id'] != $id &&
 
 	if ($pun_config['o_avatars'] == '1')
 	{
-		$avatar_field = generate_avatar_markup($id);
+		$avatar_field = generate_gravatar_markup($user['email'], 80);
 		if ($avatar_field != '')
 		{
 			$user_personality[] = '<dt>'.$lang_profile['Avatar'].'</dt>';
@@ -1385,6 +1385,13 @@ else
 		if ($pun_config['o_avatars'] == '0' && $pun_config['o_signatures'] == '0')
 			message($lang_common['Bad request']);
 
+		$user_avatar = generate_gravatar_markup($user['email'], 80);
+		$avatar_field = '<span><a href="http://gravatar.com">Change Gravatar</a></span>';
+		$lang_profile['Avatar info'] = 'A Gravatar is globally recognized avatar that is connected '.
+			'to your e-mail address and in this forum displayed with all your posts. You can '.
+			'change your Gravatar by clicking the link below.';
+
+                /*
 		$avatar_field = '<span><a href="profile.php?action=upload_avatar&amp;id='.$id.'">'.$lang_profile['Change avatar'].'</a></span>';
 
 		$user_avatar = generate_avatar_markup($id);
@@ -1392,6 +1399,7 @@ else
 			$avatar_field .= ' <span><a href="profile.php?action=delete_avatar&amp;id='.$id.'">'.$lang_profile['Delete avatar'].'</a></span>';
 		else
 			$avatar_field = '<span><a href="profile.php?action=upload_avatar&amp;id='.$id.'">'.$lang_profile['Upload avatar'].'</a></span>';
+		*/
 
 		if ($user['signature'] != '')
 			$signature_preview = '<p>'.$lang_profile['Sig preview'].'</p>'."\n\t\t\t\t\t\t\t".'<div class="postsignature postmsg">'."\n\t\t\t\t\t\t\t\t".'<hr />'."\n\t\t\t\t\t\t\t\t".$parsed_signature."\n\t\t\t\t\t\t\t".'</div>'."\n";
