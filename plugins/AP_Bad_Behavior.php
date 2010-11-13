@@ -63,6 +63,7 @@ else
 		<div class="box">
 			<div class="inbox">
 				<p><?php echo bb2_insert_stats(true) ?></p>
+				<p>Powered by <a href="http://www.bad-behavior.ioerror.us/">Bad Behavior</a> version <?php echo BB2_VERSION ?></p>
 			</div>
 		</div>
 		<h2 class="block2"><span>Settings</span></h2>
