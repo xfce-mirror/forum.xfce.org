@@ -88,7 +88,7 @@ else if ($action == 'last')
 
 // Fetch some info about the topic
 if (!$pun_user['is_guest'])
-	$result = $db->query('SELECT t.subject, t.closed, t.num_replies, t.sticky, t.first_post_id, f.id AS forum_id, f.forum_name, f.moderators, fp.post_replies, s.user_id AS is_subscribed FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id LEFT JOIN '.$db->prefix.'subscriptions AS s ON (t.id=s.topic_id AND s.user_id='.$pun_user['id'].') LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.id='.$id.' AND t.moved_to IS NULL') or error('Unable to fetch topic info', __FILE__, __LINE__, $db->error());
+	$result = $db->query('SELECT t.poster, t.subject, t.closed, t.num_replies, t.sticky, t.first_post_id, f.id AS forum_id, f.forum_name, f.moderators, fp.post_replies, s.user_id AS is_subscribed FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id LEFT JOIN '.$db->prefix.'subscriptions AS s ON (t.id=s.topic_id AND s.user_id='.$pun_user['id'].') LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.id='.$id.' AND t.moved_to IS NULL') or error('Unable to fetch topic info', __FILE__, __LINE__, $db->error());
 else
 	$result = $db->query('SELECT t.subject, t.closed, t.num_replies, t.sticky, t.first_post_id, f.id AS forum_id, f.forum_name, f.moderators, fp.post_replies, 0 FROM '.$db->prefix.'topics AS t INNER JOIN '.$db->prefix.'forums AS f ON f.id=t.forum_id LEFT JOIN '.$db->prefix.'forum_perms AS fp ON (fp.forum_id=f.id AND fp.group_id='.$pun_user['g_id'].') WHERE (fp.read_forum IS NULL OR fp.read_forum=1) AND t.id='.$id.' AND t.moved_to IS NULL') or error('Unable to fetch topic info', __FILE__, __LINE__, $db->error());
 
@@ -101,11 +101,80 @@ $cur_topic = $db->fetch_assoc($result);
 $mods_array = ($cur_topic['moderators'] != '') ? unserialize($cur_topic['moderators']) : array();
 $is_admmod = ($pun_user['g_id'] == PUN_ADMIN || ($pun_user['g_moderator'] == '1' && array_key_exists($pun_user['username'], $mods_array))) ? true : false;
 
+// Handle clicking on solve links
+if (isset($_GET['solved']) && !$pun_user['is_guest'])
+{
+	if ($cur_topic['closed'] != '0')
+	{
+		redirect('viewtopic.php?id='.$id, $lang_topic['Solved closed']);
+		exit;
+	}
+
+	if (!$is_admmod)
+	{
+		// Check the user id of the first post on this topic and some
+		// other permissions that need to be valid.
+		$valid_user = false;
+		$result = $db->query('SELECT poster_id FROM '.$db->prefix.'posts WHERE topic_id = '.$id.' ORDER BY id LIMIT 1') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
+		if ($db->num_rows($result) == 1)
+		{
+			$poster_info = $db->fetch_assoc($result);
+			if ($poster_info['poster_id'] == $pun_user['id']
+			    && (($cur_topic['post_replies'] == '' && $pun_user['g_post_replies'] == '1') 
+			        || $cur_topic['post_replies'] == '1'))
+			{
+				$valid_user = true;
+			}
+		}
+
+		if (!$valid_user)
+		{
+			redirect('viewtopic.php?id='.$id, $lang_topic['Solved not permitted']);
+			exit;
+		}
+	}
+
+	// Check if we need to change anything if so, create the new subject
+	$is_solved = (strpos($cur_topic['subject'], $lang_topic['Solved']) === 0) ? true : false;
+	if ($is_solved && $_GET['solved'] == 'false')
+		$subject = preg_replace('/^'.preg_quote($lang_topic['Solved'].'/'), '', $cur_topic['subject']);
+	else if (!$is_solved && $_GET['solved'] == 'true')
+		$subject = $lang_topic['Solved'] .' '.$cur_topic['subject'];
+	else
+		$subject = null;
+
+	// Update the database
+	if (!empty($subject))
+	{
+		if ($pun_config['o_censoring'] == '1')
+			$subject = censor_words($subject);
+		$subject = trim($subject);
+
+		$db->query('UPDATE '.$db->prefix.'topics SET subject=\''.$db->escape($subject).'\' WHERE id='.$id) or error('Unable to change solve state', __FILE__, __LINE__, $db->error());
+
+		redirect('viewtopic.php?id='.$id, $lang_topic['Solved succesfull']);
+		exit;
+	}
+}
+
+
 // Can we or can we not post replies?
 if ($cur_topic['closed'] == '0')
 {
 	if (($cur_topic['post_replies'] == '' && $pun_user['g_post_replies'] == '1') || $cur_topic['post_replies'] == '1' || $is_admmod)
-		$post_link = "\t\t\t".'<p class="postlink conr"><a href="post.php?tid='.$id.'">'.$lang_topic['Post reply'].'</a></p>'."\n";
+	{
+		$post_link = "\t\t\t".'<p class="postlink conr"><a href="post.php?tid='.$id.'">'.$lang_topic['Post reply'].'</a>'."\n";
+
+		// Show the 'Marked as (un)solved link for admins, moderators and a match in the username.
+		// The username is not safe, but we do a better check once the link is clicked.
+		if ($cur_topic['poster'] == $pun_user['username'] || $is_admmod)
+		{
+			$is_solved = strpos($cur_topic['subject'], $lang_topic['Solved']) === 0 ? false : true;
+			$post_link .= ' | <a href="viewtopic.php?id='.$id.'&solved='.($is_solved ? 'true' : 'false').'">'.$lang_topic['Mark '.($is_solved ? 'solved' : 'unsolved')].'</a>';
+		}
+
+		$post_link .= '</p>';
+	}
 	else
 		$post_link = '';
 }

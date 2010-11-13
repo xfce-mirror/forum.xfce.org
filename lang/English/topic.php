@@ -26,6 +26,13 @@ $lang_topic = array(
 'Quick post'		=>	'Quick post',
 'Mod controls'		=>	'Moderator controls',
 'New icon'			=>	'New post',
-'Re'				=>	'Re:'
+'Re'				=>	'Re:',
 
+// Solved strings
+'Mark solved'		=> 	'Mark as solved',
+'Mark unsolved'		=>	'Mark as unsolved',
+'Solved'		=>	'[Solved]',
+'Solved closed'		=>	'The topic is closed. Cannot change solve state. Redirecting …',
+'Solved not permitted'	=>	'You are not allowed to change the solve state of this topic. Redirecting …',
+'Solved succesfull'	=>	'Topic solve state changed succesfully. Redirecting …',
 );
