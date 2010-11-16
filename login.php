@@ -73,7 +73,7 @@ if (isset($_POST['form_sent']) && $action == 'in')
 		if ($authorized && $update_db_password)
 		{
 			// Replace the SMF password with an FluxBB password
-			$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\', salt=NULL WHERE id='.$cur_user['id']) 
+			$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\' WHERE id='.$cur_user['id']) 
 				or error('Unable to update user password', __FILE__, __LINE__, $db->error());
 		}
 	}
