@@ -22,7 +22,7 @@ function sha256question_get()
 				<legend>Your answer</legend>
 				<div class="infldset">
 					<label class="required">
-						<strong>What is the output of "'.$command.'"?<span>'.$lang_common['Required'].'></span></strong><br />
+						<strong>What is the output of "'.$command.'" if you run it in a terminal emulator?<span>'.$lang_common['Required'].'></span></strong><br />
 						<input type="text" name="'.$question_fld_name.'" value="" size="50" /><br />
 					</label>
 				</div>
