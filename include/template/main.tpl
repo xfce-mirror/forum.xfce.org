@@ -6,12 +6,13 @@
 <style type="text/css">
 body {
 	margin: 0;
+	font: 80% Verdana, Arial, Helvetica, sans-serif;
 }
 #page-header {
         /*border-bottom: 2px #69f solid;*/
         background: #333 url('img/logosmall.png') no-repeat 6px 55%;
 	padding-left: 120px;
-	font: 68.75%/1.4545em Verdana, Helvetica, Arial, sans-serif;
+	min-height: 45px;
 }
 #page-header ul {
 	float: right ;
@@ -45,6 +46,9 @@ body {
 }
 .clearboth {
 	clear: both;
+}
+.pun {
+	font: inherit;
 }
 </style>
 </head>
