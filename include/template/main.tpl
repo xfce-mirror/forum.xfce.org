@@ -3,49 +3,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <pun_head>
+<link rel="stylesheet" media="screen" type="text/css" href="http://www-test.xfce.org/style/header.css" />
 <style type="text/css">
 body {
 	margin: 0;
 	font: 80% Verdana, Arial, Helvetica, sans-serif;
-}
-#page-header {
-        /*border-bottom: 2px #69f solid;*/
-        background: #333 url('img/logosmall.png') no-repeat 6px 55%;
-	padding-left: 120px;
-	min-height: 45px;
-}
-#page-header ul {
-	float: right ;
-	list-style: none;
-        margin: 0;
-        padding: 0 15px 0 0;
-        background: #333;
-}
-#page-header ul li {
-	float: left;
-        font-weight: bold;
-	margin: 0;
-	padding: 0;
-}
-#page-header a {
-	color: #fff;
-        text-decoration: none;
-        display: block;
-        float: right;
-        padding: 0 15px 0 15px;
-        line-height: 4em;
-}
-#page-header ul li a:hover {
-	color: #69f;
-}
-#page-header .active {
-        color: #69f;
-}
-.hidden {
-	display: none;
-}
-.clearboth {
-	clear: both;
 }
 .pun {
 	font: inherit;
@@ -54,10 +16,10 @@ body {
 </head>
 
 <body>
-<div id="page-header">
+<div id="xfce-header">
 	<div>
-		<h1 class="hidden">Xfce</h1>
-		<h5 class="hidden">Sub domains</h5>
+		<h1 id="xfce-header-title">Xfce Forum</h1>
+		<h5 id="xfce-header-subtitle">Sub domains</h5>
 		&nbsp;
 		<ul>
 			<li><a href="http://www.xfce.org" title="Go to the homepage">Home</a></li>
@@ -70,7 +32,7 @@ body {
 			<li><a href="http://git.xfce.org" title="Project repositories">GIT</a></li>
 		</ul>
 	</div>
-	<div class="clearboth"></div>
+	<div  id="xfce-header-clear"></div>
 </div>
 
 <div id="pun<pun_page>" class="pun">
