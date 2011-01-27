@@ -1405,7 +1405,7 @@ else
 
 		$user_avatar = generate_gravatar_markup($user['email'], 80);
 		$avatar_field = '<span><a href="http://gravatar.com">Change Gravatar</a></span>';
-		$lang_profile['Avatar info'] = 'A Gravatar is globally recognized avatar that is connected '.
+		$lang_profile['Avatar info'] = 'A Gravatar is a globally recognized avatar that is connected '.
 			'to your e-mail address and in this forum displayed with all your posts. You can '.
 			'change your Gravatar by clicking the link below.';
 
