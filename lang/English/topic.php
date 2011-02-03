@@ -27,6 +27,7 @@ $lang_topic = array(
 'Mod controls'		=>	'Moderator controls',
 'New icon'			=>	'New post',
 'Re'				=>	'Re:',
+'Preview'			=>	'Preview',
 
 // Solved strings
 'Mark solved'		=> 	'Mark as solved',
