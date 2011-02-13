@@ -1,5 +1,5 @@
 <?php if (!defined('BB2_CWD')) die("I said no cheating!");
-define('BB2_VERSION', "2.1.8");
+define('BB2_VERSION', "2.1.10");
 
 // Bad Behavior entry point is bb2_start()
 // If you're reading this, you are probably lost.
@@ -40,6 +40,19 @@ function bb2_approved($settings, $package)
 	}
 }
 
+// If this is reverse-proxied or load balanced, obtain the actual client IP
+function bb2_reverse_proxy($settings, $headers_mixed)
+{
+	$addrs = array_reverse(preg_split("/[\s,]+/", $headers_mixed[$settings['reverse_proxy_header']]));
+	if (!empty($settings['reverse_proxy_addresses'])) {
+		foreach ($addrs as $addr) {
+			if (!match_cidr($addr, $settings['reverse_proxy_addresses'])) {
+				return $addr;
+			}
+		}
+	}
+	return $addrs[0];
+}
 
 // Let God sort 'em out!
 function bb2_start($settings)
@@ -67,11 +80,15 @@ function bb2_start($settings)
 	$request_uri = $_SERVER["REQUEST_URI"];
 	if (!$request_uri) $request_uri = $_SERVER['SCRIPT_NAME'];	# IIS
 
-	# Nasty CloudFlare hack provided by butchs at simplemachines
-	$ip_temp = preg_replace("/^::ffff:/", "", (array_key_exists('Cf-Connecting-Ip', $headers_mixed)) ? $_SERVER['HTTP_CF_CONNECTING_IP'] : $_SERVER['REMOTE_ADDR']);
-	$cloudflare_ip = preg_replace("/^::ffff:/", "", $_SERVER['REMOTE_ADDR']);
+	if ($settings['reverse_proxy']) {
+		$headers['X-Bad-Behavior-Remote-Address'] = $_SERVER['REMOTE_ADDR'];
+		$headers_mixed['X-Bad-Behavior-Remote-Address'] = $_SERVER['REMOTE_ADDR'];
+		$ip = bb2_reverse_proxy($settings, $headers_mixed);
+	} else {
+		$ip = $_SERVER['REMOTE_ADDR'];
+	}
 
-	@$package = array('ip' => $ip_temp, 'headers' => $headers, 'headers_mixed' => $headers_mixed, 'request_method' => $_SERVER['REQUEST_METHOD'], 'request_uri' => $request_uri, 'server_protocol' => $_SERVER['SERVER_PROTOCOL'], 'request_entity' => $request_entity, 'user_agent' => $_SERVER['HTTP_USER_AGENT'], 'is_browser' => false, 'cloudflare' => $cloudflare_ip);
+	@$package = array('ip' => $ip, 'headers' => $headers, 'headers_mixed' => $headers_mixed, 'request_method' => $_SERVER['REQUEST_METHOD'], 'request_uri' => $request_uri, 'server_protocol' => $_SERVER['SERVER_PROTOCOL'], 'request_entity' => $request_entity, 'user_agent' => $_SERVER['HTTP_USER_AGENT'], 'is_browser' => false,);
 
 	$result = bb2_screen($settings, $package);
 	if ($result && !defined('BB2_TEST')) bb2_banned($settings, $package, $result);
@@ -104,7 +121,10 @@ function bb2_screen($settings, $package)
 
 		// Check the http:BL
 		require_once(BB2_CORE . "/blackhole.inc.php");
-		if ($r = bb2_httpbl($settings, $package)) return $r;
+		if ($r = bb2_httpbl($settings, $package)) {
+			if ($r == 1) return false;	# whitelisted
+			return $r;
+		}
 
 		// Check for common stuff
 		require_once(BB2_CORE . "/common_tests.inc.php");
@@ -114,6 +134,26 @@ function bb2_screen($settings, $package)
 
 		// Specific checks
 		@$ua = $package['user_agent'];
+		// Search engine checks come first
+		if (stripos($ua, "bingbot") !== FALSE || stripos($ua, "msnbot") !== FALSE || stripos($ua, "MS Search") !== FALSE) {
+			require_once(BB2_CORE . "/searchengine.inc.php");
+			if ($r = bb2_msnbot($package)) {
+				if ($r == 1) return false;	# whitelisted
+				return $r;
+			}
+		} elseif (stripos($ua, "Googlebot") !== FALSE || stripos($ua, "Mediapartners-Google") !== FALSE || stripos($ua, "Google Wireless") !== FALSE) {
+			require_once(BB2_CORE . "/searchengine.inc.php");
+			if ($r = bb2_google($package)) {
+				if ($r == 1) return false;	# whitelisted
+				return $r;
+			}
+		} elseif (stripos($ua, "Yahoo! Slurp") !== FALSE || stripos($ua, "Yahoo! SearchMonkey") !== FALSE) {
+			require_once(BB2_CORE . "/searchengine.inc.php");
+			if ($r = bb2_yahoo($package)) {
+				if ($r == 1) return false;	# whitelisted
+				return $r;
+			}
+		}
 		// MSIE checks
 		if (stripos($ua, "; MSIE") !== FALSE) {
 			$package['is_browser'] = true;
@@ -142,15 +182,6 @@ function bb2_screen($settings, $package)
 		} elseif (stripos($ua, "MovableType") !== FALSE) {
 			require_once(BB2_CORE . "/movabletype.inc.php");
 			if ($r = bb2_movabletype($package)) return $r;
-		} elseif (stripos($ua, "msnbot") !== FALSE || stripos($ua, "MS Search") !== FALSE) {
-			require_once(BB2_CORE . "/searchengine.inc.php");
-			if ($r = bb2_msnbot($package)) return $r;
-		} elseif (stripos($ua, "Googlebot") !== FALSE || stripos($ua, "Mediapartners-Google") !== FALSE || stripos($ua, "Google Wireless") !== FALSE) {
-			require_once(BB2_CORE . "/searchengine.inc.php");
-			if ($r = bb2_google($package)) return $r;
-		} elseif (stripos($ua, "Yahoo! Slurp") !== FALSE || stripos($ua, "Yahoo! SearchMonkey") !== FALSE) {
-			require_once(BB2_CORE . "/searchengine.inc.php");
-			if ($r = bb2_yahoo($package)) return $r;
 		} elseif (stripos($ua, "Mozilla") !== FALSE && stripos($ua, "Mozilla") == 0) {
 			$package['is_browser'] = true;
 			require_once(BB2_CORE . "/browser.inc.php");
@@ -172,4 +203,3 @@ function bb2_screen($settings, $package)
 	bb2_approved($settings, $package);
 	return false;
 }
-?>
