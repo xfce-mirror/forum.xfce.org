@@ -36,7 +36,8 @@ if (isset($_POST['delete-users']) && is_array($_POST['delete-users']))
 		}
 
 		// Delete any subscriptions
-		$db->query('DELETE FROM '.$db->prefix.'subscriptions WHERE user_id='.$user) or error('Unable to delete subscriptions', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'forum_subscriptions WHERE user_id='.$user) or error('Unable to delete forum subscriptions', __FILE__, __LINE__, $db->error());
+		$db->query('DELETE FROM '.$db->prefix.'topic_subscriptions WHERE user_id='.$user) or error('Unable to delete topic subscriptions', __FILE__, __LINE__, $db->error());
 
 		// Remove him/her from the online list (if they happen to be logged in)
 		$db->query('DELETE FROM '.$db->prefix.'online WHERE user_id='.$user) or error('Unable to remove user from online list', __FILE__, __LINE__, $db->error());
