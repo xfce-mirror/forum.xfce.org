@@ -4,8 +4,8 @@
 if (!defined('PUN'))
 	exit;
 
-$no_visit_age = 60*60*24*30;
-$no_login_age = $no_visit_age * 6;
+$delete_age = 60*60*24*30 * 6; /* 6 months */
+
 $limit = 100;
 
 // Tell admin_loader.php that this is indeed a plugin and that it is loaded
@@ -63,34 +63,18 @@ if (isset($_POST['delete-users']) && is_array($_POST['delete-users']))
 			}
 		?>
 		<div class="box">
-			<div class="inbox">
-				<p>Search for users with no posts and the following setting:</p>
-				<div class="inform">
-					<table class="aligntop" style="width:300px;">
-						<tr>
-							<td>Never made a visit in<br />and regsitered before:</td>
-							<td><?php echo gmdate('M d Y H:i:s', time() - $no_visit_age); ?></td>
-						</tr>
-						<tr>
-							<td>Never visited since:</td>
-							<td><?php echo gmdate('M d Y H:i:s', time() - $no_login_age); ?></td>
-						</tr>
-						<tr>
-							<td>Limited to:</td>
-							<td><?php echo $limit; ?> users</td>
-						</tr>
-					</table>
-				</div>
-			</div>
+			<p>Search for users with no posts and the following setting:</p>
+			<p>Never made a visit or registered before: <strong><?php echo gmdate('M d Y H:i:s', time() - $delete_age); ?></strong>.</p>
+			<p>Limited to: <strong><?php echo $limit; ?> users</strong>.</p>
 		</div>
 
 		<h2 class="block2"><span>Inactive users:</span></h2>
 		<div class="box">
 			<div class="inbox"><p><?php
 			$user_result = $db->query('SELECT id, username, email, url FROM '.$db->prefix.'users WHERE group_id=4 AND num_posts = 0 AND (
-			                          (last_visit = 0 AND registered < (UNIX_TIMESTAMP() - '.$no_visit_age.'))
+			                          (last_visit = 0 AND registered < (UNIX_TIMESTAMP() - '.$delete_age.'))
 			                          OR
-			                          (last_visit < (UNIX_TIMESTAMP() - '.$no_login_age.'))) ORDER BY registered DESC LIMIT '.$limit) or error('All clear', __FILE__, __LINE__, $db->error());
+			                          (last_visit < (UNIX_TIMESTAMP() - '.$delete_age.'))) ORDER BY registered DESC LIMIT '.$limit) or error('All clear', __FILE__, __LINE__, $db->error());
 
 			if ($db->num_rows($user_result))
 			{
