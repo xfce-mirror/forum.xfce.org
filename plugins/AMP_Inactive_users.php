@@ -4,7 +4,7 @@
 if (!defined('PUN'))
 	exit;
 
-$delete_age = 60*60*24*30 * 6; /* 6 months */
+$delete_age = 60*60*24*30 * 12; /* 12 months */
 
 $limit = 100;
 
