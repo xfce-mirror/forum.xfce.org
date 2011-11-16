@@ -21,8 +21,8 @@ function sha256question_get()
 			<fieldset>
 				<legend>Your answer</legend>
 				<div class="infldset">
+					<p>What is the output of <strong>'.$command.'</strong> if you run it in a terminal emulator?<span>'.$lang_common['Required'].'></p>
 					<label class="required">
-						<strong>What is the output of "'.$command.'" if you run it in a terminal emulator?<span>'.$lang_common['Required'].'></span></strong><br />
 						<input type="text" name="'.$question_fld_name.'" value="" size="50" /><br />
 					</label>
                                         <p>Note that on some platforms (FreeBSD for example) sha256sum should be replaced with sha256 or gsha256sum.</p>
