@@ -21,7 +21,7 @@ function sha256question_get()
 			<fieldset>
 				<legend>Your answer</legend>
 				<div class="infldset">
-					<p>What is the output of <strong>'.$command.'</strong> if you run it in a terminal emulator?<span>'.$lang_common['Required'].'></p>
+					<p>What is the output of <strong>'.$command.'</strong> if you run it in a terminal emulator?<span>'.$lang_common['Required'].'</span></p>
 					<label class="required">
 						<input type="text" name="'.$question_fld_name.'" value="" size="50" /><br />
 					</label>
