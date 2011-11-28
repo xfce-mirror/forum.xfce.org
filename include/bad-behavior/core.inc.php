@@ -1,5 +1,5 @@
 <?php if (!defined('BB2_CWD')) die("I said no cheating!");
-define('BB2_VERSION', "2.1.13");
+define('BB2_VERSION', "2.1.15");
 
 // Bad Behavior entry point is bb2_start()
 // If you're reading this, you are probably lost.
@@ -142,7 +142,7 @@ function bb2_screen($settings, $package)
 				return $r;
 			}
 			return false;
-		} elseif (stripos($ua, "Googlebot") !== FALSE || stripos($ua, "Mediapartners-Google") !== FALSE) {
+		} elseif (stripos($ua, "Googlebot") !== FALSE || stripos($ua, "Mediapartners-Google") !== FALSE || stripos($ua, "Google Web Preview") !== FALSE) {
 			require_once(BB2_CORE . "/searchengine.inc.php");
 			if ($r = bb2_google($package)) {
 				if ($r == 1) return false;	# whitelisted
