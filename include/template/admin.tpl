@@ -11,6 +11,7 @@ body {
 }
 .pun {
 	font: inherit;
+	background: none;
 }
 </style>
 </head>
