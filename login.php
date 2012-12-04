@@ -16,11 +16,6 @@ require PUN_ROOT.'include/common.php';
 // Load the login.php language file
 require PUN_ROOT.'lang/'.$pun_user['language'].'/login.php';
 
-function un_htmlspecialchars($string)
-{
-	return strtr($string, array_flip(get_html_translation_table(HTML_SPECIALCHARS, ENT_QUOTES)) + array('&#039;' => '\'', '&nbsp;' => ' '));
-}
-
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 
 if (isset($_POST['form_sent']) && $action == 'in')
@@ -35,47 +30,34 @@ if (isset($_POST['form_sent']) && $action == 'in')
 	$cur_user = $db->fetch_assoc($result);
 
 	$authorized = false;
-	$update_db_password = false;
 
 	if (!empty($cur_user['password']))
 	{
-		// Will result in a SHA-1 hash
-		$form_password_hash = pun_hash($form_password);
+		$form_password_hash = pun_hash($form_password); // Will result in a SHA-1 hash
 
-		if (strlen($cur_user['password']) != 40)
+		// If there is a salt in the database we have upgraded from 1.3-legacy though haven't yet logged in
+		if (!empty($cur_user['salt']))
 		{
-			// Old SMF 1.0.x password
+			if (sha1($cur_user['salt'].sha1($form_password)) == $cur_user['password']) // 1.3 used sha1(salt.sha1(pass))
+			{
+				$authorized = true;
+
+				$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\', salt=NULL WHERE id='.$cur_user['id']) or error('Unable to update user password', __FILE__, __LINE__, $db->error());
+			}
+		}
+		// If the length isn't 40 then the password isn't using sha1, so it must be md5 from 1.2
+		else if (strlen($cur_user['password']) != 40)
+		{
 			if (md5($form_password) == $cur_user['password'])
 			{
 				$authorized = true;
-				$update_db_password = true;
-			}
-		}
-		else
-		{
-			if ($cur_user['password'] == $form_password_hash)
-			{
-				// New FluxBB password
-				$authorized = true;
-			}
-			else
-			{
-				// Old SMF 1.1.x password
-				$smf_password_hash = sha1(strtolower($form_username) . un_htmlspecialchars(stripslashes($form_password)));
-				if ($cur_user['password'] == $smf_password_hash)
-				{
-					$authorized = true;
-					$update_db_password = true;
-				}
-			}
-		}
 
-		if ($authorized && $update_db_password)
-		{
-			// Replace the SMF password with an FluxBB password
-			$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\' WHERE id='.$cur_user['id']) 
-				or error('Unable to update user password', __FILE__, __LINE__, $db->error());
+				$db->query('UPDATE '.$db->prefix.'users SET password=\''.$form_password_hash.'\' WHERE id='.$cur_user['id']) or error('Unable to update user password', __FILE__, __LINE__, $db->error());
+			}
 		}
+		// Otherwise we should have a normal sha1 password
+		else
+			$authorized = ($cur_user['password'] == $form_password_hash);
 	}
 
 	if (!$authorized)
@@ -93,7 +75,7 @@ if (isset($_POST['form_sent']) && $action == 'in')
 		generate_users_info_cache();
 	}
 
-	// Remove this users guest entry from the online list
+	// Remove this user's guest entry from the online list
 	$db->query('DELETE FROM '.$db->prefix.'online WHERE ident=\''.$db->escape(get_remote_address()).'\'') or error('Unable to delete from online list', __FILE__, __LINE__, $db->error());
 
 	$expire = ($save_pass == '1') ? time() + 1209600 : time() + $pun_config['o_timeout_visit'];
@@ -102,7 +84,7 @@ if (isset($_POST['form_sent']) && $action == 'in')
 	// Reset tracked topics
 	set_tracked_topics(null);
 
-	redirect(htmlspecialchars($_POST['redirect_url']), $lang_login['Login redirect']);
+	redirect(pun_htmlspecialchars($_POST['redirect_url']), $lang_login['Login redirect']);
 }
 
 
@@ -130,7 +112,10 @@ else if ($action == 'out')
 else if ($action == 'forget' || $action == 'forget_2')
 {
 	if (!$pun_user['is_guest'])
+	{
 		header('Location: index.php');
+		exit;
+	}
 
 	if (isset($_POST['form_sent']))
 	{
@@ -167,7 +152,7 @@ else if ($action == 'forget' || $action == 'forget_2')
 				while ($cur_hit = $db->fetch_assoc($result))
 				{
 					if ($cur_hit['last_email_sent'] != '' && (time() - $cur_hit['last_email_sent']) < 3600 && (time() - $cur_hit['last_email_sent']) >= 0)
-						message($lang_login['Email flood'], true);
+						message(sprintf($lang_login['Email flood'], intval((3600 - (time() - $cur_hit['last_email_sent'])) / 60)), true);
 
 					// Generate a new password and a new password activation code
 					$new_password = random_pass(8);
@@ -246,7 +231,10 @@ if (!empty($errors))
 
 
 if (!$pun_user['is_guest'])
+{
 	header('Location: index.php');
+	exit;
+}
 
 // Try to determine if the data in HTTP_REFERER is valid (if not, we redirect to index.php after login)
 if (!empty($_SERVER['HTTP_REFERER']))
@@ -275,6 +263,8 @@ if (!empty($_SERVER['HTTP_REFERER']))
 
 if (!isset($redirect_url))
 	$redirect_url = 'index.php';
+else if (preg_match('%viewtopic\.php\?pid=(\d+)$%', $redirect_url, $matches))
+	$redirect_url .= '#p'.$matches[1];
 
 $page_title = array(pun_htmlspecialchars($pun_config['o_board_title']), $lang_common['Login']);
 $required_fields = array('req_username' => $lang_common['Username'], 'req_password' => $lang_common['Password']);
