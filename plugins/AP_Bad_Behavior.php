@@ -56,7 +56,6 @@ else
 			<div class="inbox">
 				<p>The Bad Behavior system helps protect your site from malicious bots (spammers, email harvesters, etc).</p>
 				<p>For more information please visit the <a href="http://www.bad-behavior.ioerror.us/">Bad Behavior</a> homepage.</p>
-				<p>If you find Bad Behavior valuable, please consider making a <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=error%40ioerror%2eus&item_name=Bad%20Behavior%20<?php echo BB2_VERSION; ?>%20%28From%20Admin%29&no_shipping=1&cn=Comments%20about%20Bad%20Behavior&tax=0&currency_code=USD&bn=PP%2dDonationsBF&charset=UTF%2d8">financial contribution</a> to further development of Bad Behavior.</p>
 			</div>
 		</div>
 		<h2 class="block2"><span>Statistics:</span></h2>
