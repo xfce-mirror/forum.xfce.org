@@ -551,7 +551,7 @@ function generate_gravatar_markup($user_email, $size_override = -1)
 	else
 		$h = '';
 
-	return '<img src="http://www.gravatar.com/avatar/'.$h.'?s='.$s.'&d='.$d.'&r=g" width="'.$s.'" height="'.$s.'" alt="" />';
+	return '<img src="http://www.gravatar.com/avatar/'.$h.'?s='.$s.'&amp;d='.$d.'&amp;r=g" width="'.$s.'" height="'.$s.'" alt="" />';
 }
 
 
