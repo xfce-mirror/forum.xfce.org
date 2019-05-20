@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <pun_head>
-<link rel="stylesheet" media="screen" type="text/css" href="/style/header.css" />
+<link rel="stylesheet" media="screen" type="text/css" href="//cdn.xfce.org/style/base_header.css" />
 <style type="text/css">
 body {
 	margin: 0;
