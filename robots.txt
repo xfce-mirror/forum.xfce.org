@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /userlist.php
+Disallow: /profile.php

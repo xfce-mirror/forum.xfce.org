@@ -3,9 +3,39 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <pun_head>
+<link rel="stylesheet" media="screen" type="text/css" href="/style/header.css" />
+<style type="text/css">
+body {
+	margin: 0;
+	font: 80% Verdana, Arial, Helvetica, sans-serif;
+}
+.pun {
+	font: inherit;
+	background: none;
+}
+</style>
 </head>
 
 <body>
+<div id="xfce-header">
+	<div>
+		<h1 id="xfce-header-title">Xfce Forum</h1>
+		<h5 id="xfce-header-subtitle">Sub domains</h5>
+		&nbsp;
+		<ul>
+			<li><a href="https://www.xfce.org" title="Go to the homepage">Home</a></li>
+			<li><a href="https://docs.xfce.org" title="Official documentation">Docs</a></li>
+			<li><a href="https://archive.xfce.org" title="Download location of tarballs">Archive</a></li>
+			<li><a href="https://wiki.xfce.org" title="Community documentation">Wiki</a></li>
+			<li><a href="https://forum.xfce.org" title="Community forums" class="active">Forum</a></li>
+			<li><a href="https://bugzilla.xfce.org" title="Report and track bugs">Bugs</a></li>
+			<li><a href="https://blog.xfce.org" title="Visit the blog">Blog</a></li>
+			<li><a href="https://www.xfce.org/getinvolved/translation" title="Help translating the Xfce project">Translate</a></li>
+			<li><a href="https://git.xfce.org" title="Project repositories">GIT</a></li>
+		</ul>
+	</div>
+	<div  id="xfce-header-clear"></div>
+</div>
 
 <div id="pun<pun_page>" class="pun">
 <div class="top-box"></div>
@@ -13,10 +43,12 @@
 
 <div id="brdheader" class="block">
 	<div class="box">
+		<!--
 		<div id="brdtitle" class="inbox">
 			<pun_title>
 			<pun_desc>
 		</div>
+		-->
 		<pun_navlinks>
 		<pun_status>
 	</div>

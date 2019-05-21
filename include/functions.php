@@ -566,6 +566,30 @@ function generate_profile_menu($page = '')
 }
 
 
+
+// Outputs markup to display a user's gravatar
+//
+function generate_gravatar_markup($user_email, $size_override = -1)
+{
+	global $pun_config;
+
+	if ($size_override == -1)
+		$s = $pun_config['o_avatars_width'];
+	else
+		$s = $size_override;
+
+	$d = 'mm'; /* mysteryman */
+
+	if (!empty($user_email))
+		$h = md5 (strtolower (trim ($user_email)));
+	else
+		$h = '';
+
+	return '<img src="https://www.gravatar.com/avatar/'.$h.'?s='.$s.'&amp;d='.$d.'&amp;r=g" width="'.$s.'" height="'.$s.'" alt="" />';
+}
+
+
+
 //
 // Outputs markup to display a user's avatar
 //
