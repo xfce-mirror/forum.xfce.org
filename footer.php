@@ -122,6 +122,10 @@ else if ($footer_style == 'viewtopic')
 		</div>
 	</div>
 </div>
+
+<!-- Start Responsive JS -->
+<script src="style/Air-responsive/main.js"></script>
+<!-- End Responsive JS -->
 <?php
 
 // Display debug info (if enabled/defined)

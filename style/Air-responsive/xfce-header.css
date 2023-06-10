@@ -1,0 +1,132 @@
+@media screen and (max-width: 640px) {
+/* XFCE Header */
+#xfce-header ul:before, #brdmenu ul:before
+{
+    content: " ";
+    display: block;
+    color:white;
+    padding: 3px;
+    background-image: url("../../img/hamburger-icon.png");
+    background-size: 100%;
+    position: relative;
+    min-width: 20px;
+    min-height: 20px;
+    float: right;
+    font-size: 15px;
+}
+
+#xfce-header ul
+{
+    z-index: 999;
+}
+
+#xfce-header ul
+{
+    width: 75%;
+    background-color: #333;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#xfce-header li, #brdmenu li
+{
+    float: none !important;
+    display: none;
+    height: 30px;
+}
+
+/* Forum Menu */
+#brdwelcome .conr
+{
+    float: none !important;
+}
+
+#brdwelcome li span
+{
+    white-space: inherit;
+}
+
+/* Forum Content */
+.inbox .postleft
+{
+    float: none;
+    background-color: #f6f9fc;
+    width: 100% !important;
+    margin-left: 0 !important;
+}
+
+.pun .blockpost .postbody, .pun .blockpost .postfoot
+{
+    margin-right: 0;
+}
+
+.pun .blockpost .postright, .pun .blockpost .postfootright
+{
+    padding: 10px 15px;
+}
+
+.pun .blockpost .postfootright li
+{
+    padding: 10px 5px;
+    display: inline-block;
+}
+
+.pun .blockpost h2
+{
+    padding: 5px;
+    text-align: right;
+}
+.pun .blockpost h2 .conr
+{
+    padding-left: 4px;
+}
+
+/* Form */
+
+.pun fieldset
+{
+    min-width: 0px;
+}
+
+.pun fieldset input 
+{
+    width: 100%;
+}
+
+.pun #quickpost h2,.pun #quickpost legend
+{
+    width: auto !important;
+    position: inherit;
+    white-space: inherit;
+}
+
+/* Footer */
+
+.pun .subscribelink
+{
+    position: inherit;
+}
+
+}
+
+@media screen and (max-width: 579px) {
+/* Forum Data */
+
+.pun .blocktable .tc3
+{
+    display: none;
+}
+
+.pun .blocktable .tc2
+{
+    width: 14% !important;
+}
+}
+
+@media screen and (max-width: 454px) {
+.pun .blocktable .tc2
+{
+    display: none;
+}
+}
